@@ -1,40 +1,40 @@
 # Lite-Sora
 
-## Introduction
+## 简介
 
-Lite-Sora is a Sora replication project jointly initiated by East China Normal University and the ModelScope community, dedicated to constructing a lightweight and open-source video DiT model, with the aim of exploring further potential in generative models.
+Lite-Sora 是一个 Sora 复现项目，由华东师范大学和魔搭社区共同发起，我们致力于构建一个轻量、开源的视频 DiT 模型，探索生成式模型的更多潜力。
 
-**The source code will be released later (maybe a few days). We are refining our code for better readability and usability.**
+**源代码将会在不就后公开（可能几天），我们正在整理我们的代码来提高其可读性和易用性。**
 
-## Roadmap
+## 技术路线
 
-* [x] Implement the base architecture
-  * [ ] Models
-    * [x] Text Encoder（based on Stable Diffusion XL's [Text Encoder](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/blob/main/text_encoder_2/model.safetensors)）
-    * [x] VideoDiT（based on [Facebook DiT](https://github.com/facebookresearch/DiT)）
+* [x] 搭建基础架构
+  * [ ] 模型
+    * [x] Text Encoder（基于 Stable Diffusion XL 中的 [Text Encoder](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/blob/main/text_encoder_2/model.safetensors)）
+    * [x] VideoDiT（基于 [Facebook DiT](https://github.com/facebookresearch/DiT)）
     * [ ] VideoVAE
-  * [x] Scheduler（based on [DDIM](https://arxiv.org/abs/2010.02502)）
-  * [x] Trainer（based on [PyTorch-lightning](https://lightning.ai/docs/pytorch/stable/)）
-* [x] Validate on small datasets
+  * [x] Scheduler（基于 [DDIM](https://arxiv.org/abs/2010.02502)）
+  * [x] Trainer（基于 [PyTorch-lightning](https://lightning.ai/docs/pytorch/stable/)）
+* [x] 小规模数据集验证
   * [x] [Pixabay100](https://github.com/ECNU-CILAB/Pixabay100)
-* [ ] Train Video Encoder & Decoder on large datasets
-* [ ] Train VideoDiT on large datasets
+* [ ] 在大规模数据集上训练 Video Encoder & Decoder
+* [ ] 在大规模数据集上训练 VideoDiT
 
-## Usage
+## 使用
 
-### Python Environment
+### Python 环境搭建
 
 ```
 conda env create -f environment.yml
 conda activate litesora
 ```
 
-### Download Models
+### 下载模型
 
-* `models/text_encoder/model.safetensors`: Stable Diffusion XL's Text Encoder. [download](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/text_encoder_2/model.safetensors)
-* `models/denoising_model/model.safetensors`：We trained a denoising model using a small dataset [Pixabay100](https://github.com/ECNU-CILAB/Pixabay100). This model serves to demonstrate that our training code is capable of fitting the training data properly, with a resolution of 64*64. **Obviously this model is overfitting due to the limited amount of training data, and thus it lacks generalization capability at this stage. Its purpose is solely for verifying the correctness of the training algorithm.** [download](https://huggingface.co/ECNU-CILab/lite-sora-v1-pixabay100/resolve/main/denoising_model/model.safetensors)
+* `models/text_encoder/model.safetensors`: 来自 Stable Diffusion XL 的 Text Encoder，[下载链接](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/text_encoder_2/model.safetensors)
+* `models/denoising_model/model.safetensors`：我们在 [Pixabay100](https://github.com/ECNU-CILAB/Pixabay100) 数据集上训练的模型，该模型可以证明我们的训练代码能够正常拟合训练数据，分辨率为 64*64。**这个模型显然是过拟合的，由于训练数据少，尚不具备泛化能力，仅用于验证训练算法的正确性。** [下载链接](https://huggingface.co/ECNU-CILab/lite-sora-v1-pixabay100/resolve/main/denoising_model/model.safetensors)
 
-### Training
+### 训练
 
 ```python
 from litesora.data import TextVideoDataset
@@ -61,13 +61,13 @@ if __name__ == '__main__':
     trainer.fit(model=model, train_dataloaders=train_loader)
 ```
 
-While the training program is running, you can launch `tensorboard` to see the training loss.
+训练程序启动后，可开启 `tensorboard` 监视训练进度
 
 ```
 tensorboard --logdir .
 ```
 
-### Inference
+### 推理
 
 ```python
 from litesora.models import SDXLTextEncoder2, VideoDiT
@@ -92,9 +92,9 @@ video = pipe(prompt=prompt, num_inference_steps=100)
 save_video(video, "output.mp4", upscale=8)
 ```
 
-### Results (Experimental)
+### 现阶段效果展示
 
-We trained a denoising model using a small dataset [Pixabay100](https://github.com/ECNU-CILAB/Pixabay100). This model serves to demonstrate that our training code is capable of fitting the training data properly, with a resolution of 64*64. **Obviously this model is overfitting due to the limited amount of training data, and thus it lacks generalization capability at this stage. Its purpose is solely for verifying the correctness of the training algorithm.** [download](https://huggingface.co/ECNU-CILab/lite-sora-v1-pixabay100/resolve/main/denoising_model/model.safetensors)
+我们在 [Pixabay100](https://github.com/ECNU-CILAB/Pixabay100) 数据集上训练的模型，该模型可以证明我们的训练代码能够正常拟合训练数据，分辨率为 64*64。**这个模型显然是过拟合的，由于训练数据少，尚不具备泛化能力，仅用于验证训练算法的正确性。** [下载链接](https://huggingface.co/ECNU-CILab/lite-sora-v1-pixabay100/resolve/main/denoising_model/model.safetensors)
 
 |airport, people, crowd, busy|beach, ocean, waves, water, sand|bee, honey, insect, beehive, nature|coffee, beans, caffeine, coffee, shop|
 |-|-|-|-|
