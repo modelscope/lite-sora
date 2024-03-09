@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Lite-Sora is a Sora replication project jointly initiated by East China Normal University and the ModelScope community, dedicated to constructing a lightweight and open-source video DiT model, with the aim of exploring further potential in generative models.
+The lite-sora project is an initiative to replicate Sora, co-launched by East China Normal University and the ModelScope community. It aims to explore the minimal reproduction and streamlined implementation of the video generation algorithms behind Sora. We hope to provide concise and readable code to facilitate collective experimentation and improvement, continuously pushing the boundaries of open-source video generation technology.
 
 **The source code will be released later (maybe a few days). We are refining our code for better readability and usability.**
 
