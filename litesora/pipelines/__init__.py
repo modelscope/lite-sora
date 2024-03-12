@@ -1,0 +1,1 @@
+from .pixel_video_dit import PixelVideoDiTPipeline
