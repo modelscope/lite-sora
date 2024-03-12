@@ -1,0 +1,402 @@
+[
+    {
+        "path": "videos/dubrovnik_-_12866 (1080p).mp4",
+        "text": "dubrovnik, sunset, sea, city"
+    },
+    {
+        "path": "videos/seoul_-_21985 (Original).mp4",
+        "text": "seoul, city, streets, road, night, view"
+    },
+    {
+        "path": "videos/daffodil_-_34826 (1080p).mp4",
+        "text": "easter, bell, daffodil, easter, spring"
+    },
+    {
+        "path": "videos/airport_-_36510 (Original).mp4",
+        "text": "airport, people, crowd, busy"
+    },
+    {
+        "path": "videos/surf_-_36609 (1080p).mp4",
+        "text": "surf, sea, ocean, wave, beach, water"
+    },
+    {
+        "path": "videos/ijen_-_37079 (1080p).mp4",
+        "text": "ijen, crater, indonesia, mine, volcano"
+    },
+    {
+        "path": "videos/waterfall_-_37088 (1080p).mp4",
+        "text": "waterfall, water, river, nature"
+    },
+    {
+        "path": "videos/bee_-_37144 (Original).mp4",
+        "text": "bee, oilseed, rape, blossom, bloom"
+    },
+    {
+        "path": "videos/underwater_-_37712 (Original).mp4",
+        "text": "underwater, sea, ocean, water"
+    },
+    {
+        "path": "videos/woman_-_38084 (Original).mp4",
+        "text": "woman, phone, smartphone, technology"
+    },
+    {
+        "path": "videos/bee_-_39116 (Original).mp4",
+        "text": "bee, honey, insect, beehive, nature"
+    },
+    {
+        "path": "videos/cycling_-_39183 (Original).mp4",
+        "text": "cycling, man, bike, helmet, road"
+    },
+    {
+        "path": "videos/nature_-_42420 (Original).mp4",
+        "text": "nature, rain, plant, water, garden"
+    },
+    {
+        "path": "videos/china_-_43238 (Original).mp4",
+        "text": "china, the, poet, tea, culture, read"
+    },
+    {
+        "path": "videos/girl_-_43459 (1080p).mp4",
+        "text": "girl, writing, student, female, book"
+    },
+    {
+        "path": "videos/hair_-_43633 (Original).mp4",
+        "text": "hair, wind, girl, woman, people"
+    },
+    {
+        "path": "videos/river_-_44509 (1080p).mp4",
+        "text": "river, urban, city, architecture"
+    },
+    {
+        "path": "videos/fishing_-_44534 (Original).mp4",
+        "text": "fishing, fish, fisherman, water"
+    },
+    {
+        "path": "videos/trail_-_44702 (1080p).mp4",
+        "text": "path, people, helicopter, mountains"
+    },
+    {
+        "path": "videos/creux_de_van_-_45150 (Original).mp4",
+        "text": "clouds, mountains, panorama, outdoor"
+    },
+    {
+        "path": "videos/coffee_-_45358 (Original).mp4",
+        "text": "coffee, beans, caffeine, coffee, shop"
+    },
+    {
+        "path": "videos/glacier_express_-_45569 (1080p).mp4",
+        "text": "glacier, express, bernina, express, rhb"
+    },
+    {
+        "path": "videos/bird_-_46026 (Original).mp4",
+        "text": "bird, parrot, nature, animal, colorful"
+    },
+    {
+        "path": "videos/alone_-_46637 (Original).mp4",
+        "text": "alone, person, man, people, guitar"
+    },
+    {
+        "path": "videos/coffee_-_46989 (1080p).mp4",
+        "text": "coffee, hot, drink, coffee, pot"
+    },
+    {
+        "path": "videos/windmill_-_47905 (1080p).mp4",
+        "text": "windmill, landscape, energy, sky"
+    },
+    {
+        "path": "videos/golden_-_48569 (1080p).mp4",
+        "text": "golden, particles, overlay, decoration"
+    },
+    {
+        "path": "videos/forest_-_49981 (Original).mp4",
+        "text": "forest, woods, mystical, morning"
+    },
+    {
+        "path": "videos/sea_-_53127 (Original).mp4",
+        "text": "sea, beach, sunset, tree"
+    },
+    {
+        "path": "videos/fog_-_53358 (1080p).mp4",
+        "text": "fog, mountains, road, foggy, dramatic"
+    },
+    {
+        "path": "videos/trafic_-_53902 (Original).mp4",
+        "text": "traffic, city, traffic, drone"
+    },
+    {
+        "path": "videos/sheep_-_57647 (1080p).mp4",
+        "text": "sheep, morning, sunray, nature"
+    },
+    {
+        "path": "videos/road_-_57993 (1080p).mp4",
+        "text": "road, highway, drive, car, alps"
+    },
+    {
+        "path": "videos/woman_-_58142 (Original).mp4",
+        "text": "woman, flowers, plants, field, garden"
+    },
+    {
+        "path": "videos/mountains_-_59291 (1080p).mp4",
+        "text": "mountains, fog, clouds, sunset"
+    },
+    {
+        "path": "videos/sunflowers_-_59483 (1080p).mp4",
+        "text": "sunflowers, bees, field, bloom, summer"
+    },
+    {
+        "path": "videos/mountains_-_61818 (Original).mp4",
+        "text": "mountains, trees, woods, forest"
+    },
+    {
+        "path": "videos/ocean_-_62249 (Original).mp4",
+        "text": "ocean, sunset, sea, beach, coast"
+    },
+    {
+        "path": "videos/woman_-_63241 (Original).mp4",
+        "text": "woman, mask, healthcare, young"
+    },
+    {
+        "path": "videos/clouds_-_64759 (1080p).mp4",
+        "text": "clouds, cumulus, sky, fluffy, outdoors"
+    },
+    {
+        "path": "videos/clouds_-_64767 (1080p).mp4",
+        "text": "clouds, cumulus, sky, fluffy, outdoors"
+    },
+    {
+        "path": "videos/record_-_65390 (1080p).mp4",
+        "text": "record, record, player, vinyl"
+    },
+    {
+        "path": "videos/cat_-_65438 (1080p).mp4",
+        "text": "cat, feline, animal, mammal, kitten"
+    },
+    {
+        "path": "videos/ocean_-_65560 (Original).mp4",
+        "text": "ocean, waves, water, shore, florida"
+    },
+    {
+        "path": "videos/highland_cows_-_65903 (1080p).mp4",
+        "text": "highland, cows, cows, cattle, scotland"
+    },
+    {
+        "path": "videos/grass_-_66810 (1080p).mp4",
+        "text": "grass, dew, field, fog, morning"
+    },
+    {
+        "path": "videos/flowers_-_66823 (1080p).mp4",
+        "text": "flowers, cherry, flower, petals, bloom"
+    },
+    {
+        "path": "videos/lake_-_67201 (1080p).mp4",
+        "text": "lake, houses, hill, mountain, boat"
+    },
+    {
+        "path": "videos/ink_-_67358 (1080p).mp4",
+        "text": "ink, water, underwater, foam, smoke"
+    },
+    {
+        "path": "videos/waves_-_70796 (1080p).mp4",
+        "text": "waves, ocean, sea, beach, byron, bay"
+    },
+    {
+        "path": "videos/waves_-_71122 (1080p).mp4",
+        "text": "waves, sea, ocean, storm, water, tide"
+    },
+    {
+        "path": "videos/blackthorn_-_71457 (1080p).mp4",
+        "text": "blackthorn, bud, blossom, bloom"
+    },
+    {
+        "path": "videos/bike_-_72566 (1080p).mp4",
+        "text": "bike, beach, biker, mountain, bike"
+    },
+    {
+        "path": "videos/flowers_-_72763 (1080p).mp4",
+        "text": "flower, dandelion, wild, flowers"
+    },
+    {
+        "path": "videos/sand_-_73847 (1080p).mp4",
+        "text": "sand, hand, beach, dessert, sea"
+    },
+    {
+        "path": "videos/ocean_-_74888 (1080p).mp4",
+        "text": "ocean, birds, waves, beach, sunset"
+    },
+    {
+        "path": "videos/water_lilies_-_75008 (1080p).mp4",
+        "text": "water, lilies, lotus, pond"
+    },
+    {
+        "path": "videos/skyscrapers_-_80724 (1080p).mp4",
+        "text": "skyscrapers, sunset, skyline, clouds"
+    },
+    {
+        "path": "videos/mountains_-_81945 (1080p).mp4",
+        "text": "mountains, parachute, paragliding"
+    },
+    {
+        "path": "videos/sunrise_-_83880 (Original).mp4",
+        "text": "sunrise, sunbeams, trees, woods"
+    },
+    {
+        "path": "videos/people_-_84973 (1080p).mp4",
+        "text": "people, sunset, stroll, moscow, glare"
+    },
+    {
+        "path": "videos/aurora_borealis_-_90877 (1080p).mp4",
+        "text": "aurora, borealis, northern, lights"
+    },
+    {
+        "path": "videos/mountains_-_91545 (1080p).mp4",
+        "text": "mountains, alps, fog, snow, clouds"
+    },
+    {
+        "path": "videos/skyscrapers_-_91744 (1080p).mp4",
+        "text": "skyscrapers, buildings, city, urban"
+    },
+    {
+        "path": "videos/skate_-_110734 (1080p).mp4",
+        "text": "skate, sport, water, action, exercise"
+    },
+    {
+        "path": "videos/sakura_-_110790 (Original).mp4",
+        "text": "sakura, flowers, spring, nature, japan"
+    },
+    {
+        "path": "videos/jellyfish_-_110877 (Original).mp4",
+        "text": "jellyfish, underwater, ocean, water"
+    },
+    {
+        "path": "videos/fish_-_110879 (Original).mp4",
+        "text": "fish, underwater, aquarium, swim"
+    },
+    {
+        "path": "videos/forest_-_111101 (Original).mp4",
+        "text": "forest, nature, fog, mist, morning"
+    },
+    {
+        "path": "videos/sunset_-_111204 (1080p).mp4",
+        "text": "sunset, nature, sky, dubai"
+    },
+    {
+        "path": "videos/beach_-_111263 (1080p).mp4",
+        "text": "beach, ocean, waves, water, sand"
+    },
+    {
+        "path": "videos/nature_-_111508 (Original).mp4",
+        "text": "nature, mountains, grass, flowers"
+    },
+    {
+        "path": "videos/daffodils_-_112389 (1080p).mp4",
+        "text": "daffodils, easter, bells, spring"
+    },
+    {
+        "path": "videos/wood_anemones_-_112429 (Original).mp4",
+        "text": "wood, anemones, wildflower, flower"
+    },
+    {
+        "path": "videos/woman_of_the_sea_-_112722 (Original).mp4",
+        "text": "live, wallpaper, sea, water, waves"
+    },
+    {
+        "path": "videos/windmill_-_112957 (Original).mp4",
+        "text": "windmill, turbine, energy"
+    },
+    {
+        "path": "videos/blossoms_-_113004 (Original).mp4",
+        "text": "blooms, tree, blossoms, spring, branch"
+    },
+    {
+        "path": "videos/frog_-_113403 (Original).mp4",
+        "text": "frog, reeds, green"
+    },
+    {
+        "path": "videos/135658 (1080p).mp4",
+        "text": "ocean, beach, sunset, sea, atmosphere"
+    },
+    {
+        "path": "videos/138588 (1080p).mp4",
+        "text": "sea, ocean, beach, waves, sun, dusk"
+    },
+    {
+        "path": "videos/140111 (1080p).mp4",
+        "text": "sea, ocean, seagulls, birds, sunset"
+    },
+    {
+        "path": "videos/141964 (Original).mp4",
+        "text": "christmas, christmas, decorations"
+    },
+    {
+        "path": "videos/142579 (Original).mp4",
+        "text": "pine, forest, snow, winter, snowfall"
+    },
+    {
+        "path": "videos/146169 (1080p).mp4",
+        "text": "clouds, sunlight, view, drone, nature"
+    },
+    {
+        "path": "videos/152740 (Original).mp4",
+        "text": "reeds, grass, wind, golden, sunshine"
+    },
+    {
+        "path": "videos/153167-804706404 (1080p).mp4",
+        "text": "beach, sea, sand, island, elafonisos"
+    },
+    {
+        "path": "videos/153976-806571973 (1080p).mp4",
+        "text": "sunset, sea, sun, evening, atmosphere"
+    },
+    {
+        "path": "videos/158349 (1080p).mp4",
+        "text": "beach, waves, natural, scenery, morning"
+    },
+    {
+        "path": "videos/158384 (1080p).mp4",
+        "text": "clouds, cloudscape, wind, nature"
+    },
+    {
+        "path": "videos/158980 (1080p).mp4",
+        "text": "lion, animal, wildlife, safari, lions"
+    },
+    {
+        "path": "videos/159627 (1080p).mp4",
+        "text": "flow, rocks, water, fluent, stones"
+    },
+    {
+        "path": "videos/160767 (1080p).mp4",
+        "text": "ocean, beach, waves, breaking, waves"
+    },
+    {
+        "path": "videos/161071 (1080p).mp4",
+        "text": "river, road, mountain, forest, nature"
+    },
+    {
+        "path": "videos/161178 (Original).mp4",
+        "text": "flower, gemswurz, yellow"
+    },
+    {
+        "path": "videos/163333 (1080p).mp4",
+        "text": "dandelion, blossom, bloom, faded"
+    },
+    {
+        "path": "videos/163869 (1080p).mp4",
+        "text": "flower, water, lilies, lake"
+    },
+    {
+        "path": "videos/164215 (1080p).mp4",
+        "text": "flower, poppy, wind, wildflower, plant"
+    },
+    {
+        "path": "videos/164360 (1080p).mp4",
+        "text": "fogging, landscape, forest, grasslands"
+    },
+    {
+        "path": "videos/166808 (Original).mp4",
+        "text": "carpenter, tool, handmade, industry"
+    },
+    {
+        "path": "videos/168572 (Original).mp4",
+        "text": "snowball, flower, white, spherical"
+    }
+]

@@ -1,0 +1,17 @@
+name: litesora
+channels:
+  - pytorch
+  - nvidia
+  - defaults
+dependencies:
+  - python=3.9.16
+  - pip=23.0.1
+  - cudatoolkit
+  - pytorch==2.1.0
+  - lightning
+  - transformers
+  - pip:
+    - einops
+    - imageio
+    - imageio[ffmpeg]
+    - tensorboard
