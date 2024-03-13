@@ -4,8 +4,6 @@
 
 The lite-sora project is an initiative to replicate Sora, co-launched by East China Normal University and the ModelScope community. It aims to explore the minimal reproduction and streamlined implementation of the video generation algorithms behind Sora. We hope to provide concise and readable code to facilitate collective experimentation and improvement, continuously pushing the boundaries of open-source video generation technology.
 
-**The source code will be released later (maybe a few days). We are refining our code for better readability and usability.**
-
 ## Roadmap
 
 * [x] Implement the base architecture
@@ -33,6 +31,7 @@ conda activate litesora
 
 * `models/text_encoder/model.safetensors`: Stable Diffusion XL's Text Encoder. [download](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/text_encoder_2/model.safetensors)
 * `models/denoising_model/model.safetensors`：We trained a denoising model using a small dataset [Pixabay100](https://github.com/ECNU-CILAB/Pixabay100). This model serves to demonstrate that our training code is capable of fitting the training data properly, with a resolution of 64*64. **Obviously this model is overfitting due to the limited amount of training data, and thus it lacks generalization capability at this stage. Its purpose is solely for verifying the correctness of the training algorithm.** [download](https://huggingface.co/ECNU-CILab/lite-sora-v1-pixabay100/resolve/main/denoising_model/model.safetensors)
+* `models/vae/model.safetensors`: Stable Video Diffusion's VAE. [download](https://huggingface.co/stabilityai/stable-video-diffusion-img2vid-xt/resolve/main/vae/diffusion_pytorch_model.fp16.safetensors)
 
 ### Training
 
@@ -69,6 +68,8 @@ tensorboard --logdir .
 
 ### Inference
 
+* Synthesize a video in the pixel space.
+
 ```python
 from litesora.models import SDXLTextEncoder2, VideoDiT
 from litesora.pipelines import PixelVideoDiTPipeline
@@ -92,6 +93,34 @@ video = pipe(prompt=prompt, num_inference_steps=100)
 save_video(video, "output.mp4", upscale=8)
 ```
 
+* Encode a video into the latent space, and then decode it.
+
+
+```python
+from litesora.models import SDVAEEncoder, SVDVAEDecoder
+from litesora.data import load_video, tensor2video, concat_video, save_video
+import torch
+from tqdm import tqdm
+
+
+frames = load_video("data/pixabay100/videos/168572 (Original).mp4",
+                    num_frames=1024, height=1024, width=1024, random_crop=False)
+frames = frames.to(dtype=torch.float16, device="cpu")
+
+encoder = SDVAEEncoder.from_diffusers("models/vae/model.safetensors").to(dtype=torch.float16, device="cuda")
+decoder = SVDVAEDecoder.from_diffusers("models/vae/model.safetensors").to(dtype=torch.float16, device="cuda")
+
+with torch.no_grad():
+    print(frames.shape)
+    latents = encoder.encode_video(frames, progress_bar=tqdm)
+    print(latents.shape)
+    decoded_frames = decoder.decode_video(latents, progress_bar=tqdm)
+
+video = tensor2video(concat_video([frames, decoded_frames]))
+save_video(video, "video.mp4", fps=24)
+```
+
+
 ### Results (Experimental)
 
 We trained a denoising model using a small dataset [Pixabay100](https://github.com/ECNU-CILAB/Pixabay100). This model serves to demonstrate that our training code is capable of fitting the training data properly, with a resolution of 64*64. **Obviously this model is overfitting due to the limited amount of training data, and thus it lacks generalization capability at this stage. Its purpose is solely for verifying the correctness of the training algorithm.** [download](https://huggingface.co/ECNU-CILab/lite-sora-v1-pixabay100/resolve/main/denoising_model/model.safetensors)
@@ -103,3 +132,7 @@ We trained a denoising model using a small dataset [Pixabay100](https://github.c
 |![](assets/fish_underwater_aquarium_swim.gif)|![](assets/forest_woods_mystical_morning.gif)|![](assets/ocean_beach_sunset_sea_atmosphere.gif)|![](assets/hair_wind_girl_woman_people.gif)|
 |reeds, grass, wind, golden, sunshine|sea, ocean, seagulls, birds, sunset|woman, flowers, plants, field, garden|wood, anemones, wildflower, flower|
 |![](assets/reeds_grass_wind_golden_sunshine.gif)|![](assets/sea_ocean_seagulls_birds_sunset.gif)|![](assets/woman_flowers_plants_field_garden.gif)|![](assets/wood_anemones_wildflower_flower.gif)|
+
+We leverage the VAE model from [Stable-Video-Diffusion](https://huggingface.co/stabilityai/stable-video-diffusion-img2vid-xt) to encode videos to the latent space. Our code supports extremely long high-resolution videos!
+
+https://github.com/modelscope/lite-sora/assets/35051019/dc205719-d0bc-4bca-b117-ff5aa19ebd86
