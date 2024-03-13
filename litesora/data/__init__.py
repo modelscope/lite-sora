@@ -1,2 +1,2 @@
-from .utils import save_video
+from .utils import *
 from .text_video_dataset import TextVideoDataset
