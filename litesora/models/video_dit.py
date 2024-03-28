@@ -26,21 +26,21 @@ class ConditioningFusion(torch.nn.Module):
 
     def forward(self, conditionings):
         conditionings = [proj(conditioning) for conditioning, proj in zip(conditionings, self.projs)]
-        conditionings = torch.stack(conditionings).sum(axis=0)
+        conditionings = torch.stack(conditionings).sum(dim=0)
         return conditionings
-
+    
 
 class AdaLayerNormZero(torch.nn.Module):
-    def __init__(self, dim_time, dim_text, dim_out):
+    def __init__(self, dims_in, dim_out):
         super().__init__()
-        self.fusion = ConditioningFusion([dim_time, dim_text], dim_out)
-        self.linear = torch.nn.Linear(dim_out, 6 * dim_out)
+        self.fusion = ConditioningFusion(dims_in, dim_out)
+        self.linear = torch.nn.Linear(dim_out, 3 * dim_out)
 
-    def forward(self, time_emb, text_emb):
-        conditionings = self.fusion([time_emb, text_emb])
+    def forward(self, conditionings):
+        conditionings = self.fusion(conditionings)
         conditionings = self.linear(torch.nn.functional.silu(conditionings)).unsqueeze(1)
-        shift_msa, scale_msa, gate_msa, shift_mlp, scale_mlp, gate_mlp = conditionings.chunk(6, dim=-1)
-        return shift_msa, scale_msa, gate_msa, shift_mlp, scale_mlp, gate_mlp
+        shift, scale, gate = conditionings.chunk(3, dim=-1)
+        return shift, scale, gate
 
 
 class DiTFeedForward(torch.nn.Module):
@@ -55,51 +55,102 @@ class DiTFeedForward(torch.nn.Module):
         hidden_states = torch.nn.functional.gelu(hidden_states.to(dtype=torch.float32), approximate="tanh").to(dtype=dtype)
         hidden_states = self.proj_out(hidden_states)
         return hidden_states
+    
 
-
-class DiTBlock(torch.nn.Module):
-    def __init__(self, dim_out, dim_time, dim_text, dim_head):
+class DiTBlockA(torch.nn.Module):
+    def __init__(self, dim_out, dims_cond, dim_cross, dim_head):
         super().__init__()
-        self.adaln = AdaLayerNormZero(dim_time, dim_text, dim_out)
-        self.norm1 = torch.nn.LayerNorm(dim_out, eps=1e-5, elementwise_affine=False)
-        self.attn1 = Attention(dim_out, dim_out // dim_head, dim_head, bias_q=True, bias_kv=True, bias_out=True)
-        self.norm2 = torch.nn.LayerNorm(dim_out, 1e-5, elementwise_affine=False)
-        self.ff = DiTFeedForward(dim_out)
+        self.adaln = AdaLayerNormZero(dims_cond, dim_out)
+        self.norm = torch.nn.LayerNorm(dim_out, eps=1e-5, elementwise_affine=False)
+        self.attn = Attention(dim_out, dim_out // dim_head, dim_head, bias_q=True, bias_kv=True, bias_out=True)
 
-
-    def forward(self, hidden_states, time_emb, text_emb):
+    def forward(self, hidden_states, conditionings, cross_emb):
         # 0. AdaLayerNormZero (Conditioning Fusion)
-        beta_1, gamma_1, alpha_1, beta_2, gamma_2, alpha_2 = self.adaln(time_emb, text_emb)
+        beta, gamma, alpha = self.adaln(conditionings)
 
         # 1. Layer Norm
-        norm_hidden_states = self.norm1(hidden_states)
+        norm_hidden_states = self.norm(hidden_states)
 
         # 2. Scale, Shift
-        norm_hidden_states = norm_hidden_states * (1 + gamma_1) + beta_1
+        norm_hidden_states = norm_hidden_states * (1 + gamma) + beta
 
-        # 3. Multi-Head Self-Attention
-        attn_output = self.attn1(norm_hidden_states)
+        # 3. Self-Attention
+        attn_output = self.attn(norm_hidden_states)
 
         # 4. Scale & Add
-        hidden_states = alpha_1 * attn_output + hidden_states
-
-        # 5. Layer Norm
-        norm_hidden_states = self.norm2(hidden_states)
-
-        # 6. Scale & Shift
-        norm_hidden_states = norm_hidden_states * (1 + gamma_2) + beta_2
-
-        # 7. Pointwise Feedforward
-        ff_output = self.ff(norm_hidden_states)
-
-        # 8. Scale & Add
-        hidden_states = alpha_2 * ff_output + hidden_states
+        hidden_states = alpha * attn_output + hidden_states
 
         return hidden_states
     
 
-class VideoPatchEmbed(torch.nn.Module):
-    def __init__(self, base_size=(16, 16, 16), patch_size=(16, 16, 16), in_channels=3, embed_dim=512):
+class DiTBlockB(torch.nn.Module):
+    def __init__(self, dim_out, dims_cond, dim_cross, dim_head):
+        super().__init__()
+        self.adaln = AdaLayerNormZero(dims_cond, dim_out)
+        self.norm = torch.nn.LayerNorm(dim_out, eps=1e-5, elementwise_affine=False)
+        self.attn = Attention(dim_out, dim_out // dim_head, dim_head, kv_dim=dim_cross, bias_q=True, bias_kv=True, bias_out=True)
+
+    def forward(self, hidden_states, conditionings, cross_emb):
+        # 0. AdaLayerNormZero (Conditioning Fusion)
+        beta, gamma, alpha = self.adaln(conditionings)
+
+        # 1. Layer Norm
+        norm_hidden_states = self.norm(hidden_states)
+
+        # 2. Scale, Shift
+        norm_hidden_states = norm_hidden_states * (1 + gamma) + beta
+
+        # 3. Cross-Attention
+        attn_output = self.attn(norm_hidden_states, encoder_hidden_states=cross_emb)
+
+        # 4. Scale & Add
+        hidden_states = alpha * attn_output + hidden_states
+
+        return hidden_states
+    
+
+class DiTBlockC(torch.nn.Module):
+    def __init__(self, dim_out, dims_cond, dim_cross, dim_head):
+        super().__init__()
+        self.adaln = AdaLayerNormZero(dims_cond, dim_out)
+        self.norm = torch.nn.LayerNorm(dim_out, eps=1e-5, elementwise_affine=False)
+        self.ff = DiTFeedForward(dim_out)
+
+    def forward(self, hidden_states, conditionings, cross_emb):
+        # 0. AdaLayerNormZero (Conditioning Fusion)
+        beta, gamma, alpha = self.adaln(conditionings)
+
+        # 1. Layer Norm
+        norm_hidden_states = self.norm(hidden_states)
+
+        # 2. Scale & Shift
+        norm_hidden_states = norm_hidden_states * (1 + gamma) + beta
+
+        # 3. Pointwise Feedforward
+        ff_output = self.ff(norm_hidden_states)
+
+        # 4. Scale & Add
+        hidden_states = alpha * ff_output + hidden_states
+
+        return hidden_states
+
+
+class DiTBlock(torch.nn.Module):
+    def __init__(self, dim_out, dims_cond, dim_cross, dim_head):
+        super().__init__()
+        self.blockA = DiTBlockA(dim_out, dims_cond, dim_cross, dim_head)
+        self.blockB = DiTBlockB(dim_out, dims_cond, dim_cross, dim_head)
+        self.blockC = DiTBlockC(dim_out, dims_cond, dim_cross, dim_head)
+
+    def forward(self, hidden_states, conditionings, cross_emb):
+        hidden_states = self.blockA(hidden_states, conditionings, cross_emb)
+        hidden_states = self.blockB(hidden_states, conditionings, cross_emb)
+        hidden_states = self.blockC(hidden_states, conditionings, cross_emb)
+        return hidden_states
+    
+
+class Patchify(torch.nn.Module):
+    def __init__(self, base_size=(None, 16, 16), patch_size=(16, 16, 16), in_channels=3, embed_dim=512):
         super().__init__()
         self.base_size = base_size
         self.patch_size = patch_size
@@ -107,8 +158,8 @@ class VideoPatchEmbed(torch.nn.Module):
         self.proj_pos = torch.nn.Linear(embed_dim*3, embed_dim)
         self.proj_latent = torch.nn.Conv3d(in_channels, embed_dim, kernel_size=patch_size, stride=patch_size, bias=True)
 
-    def get_pos_embedding_1d(self, embed_dim, pos):
-        omega = torch.arange(embed_dim // 2).to(torch.float64) * (2.0 / embed_dim)
+    def get_pos_embedding_1d(self, embed_dim, pos, device):
+        omega = torch.arange(embed_dim // 2).to(dtype=torch.float64, device=device) * (2.0 / embed_dim)
         omega = 1.0 / 10000**omega
 
         pos = pos.reshape(-1)
@@ -119,26 +170,25 @@ class VideoPatchEmbed(torch.nn.Module):
         emb = torch.concatenate([emb_sin, emb_cos], axis=1)
         return emb
 
-    def get_pos_embedding_3d(self, embed_dim, grid_size, base_size):
-        grid_t = torch.arange(grid_size[0]) / (grid_size[0] / base_size[0])
-        grid_h = torch.arange(grid_size[1]) / (grid_size[1] / base_size[1])
-        grid_w = torch.arange(grid_size[2]) / (grid_size[2] / base_size[2])
+    def get_pos_embedding_3d(self, embed_dim, grid_size, start_sec, end_sec, device):
+        grid_t = torch.arange(grid_size[0], device=device) / grid_size[0] * (end_sec - start_sec) + start_sec
+        grid_h = torch.arange(grid_size[1], device=device) / (grid_size[1] / self.base_size[1])
+        grid_w = torch.arange(grid_size[2], device=device) / (grid_size[2] / self.base_size[2])
         grid = torch.stack([
             repeat(grid_t, "T -> T H W", T=grid_size[0], H=grid_size[1], W=grid_size[2]),
             repeat(grid_h, "H -> T H W", T=grid_size[0], H=grid_size[1], W=grid_size[2]),
             repeat(grid_w, "W -> T H W", T=grid_size[0], H=grid_size[1], W=grid_size[2]),
         ])
-        pos_embed = self.get_pos_embedding_1d(embed_dim, grid)
+        pos_embed = self.get_pos_embedding_1d(embed_dim, grid, device)
         pos_embed = rearrange(pos_embed, "(C N) D -> N (C D)", C=3)
         return pos_embed
 
-    def forward(self, latent):
-        pos_embed = self.get_pos_embedding_3d(
-            self.embed_dim,
-            (latent.shape[-3] // self.patch_size[0], latent.shape[-2] // self.patch_size[1], latent.shape[-1] // self.patch_size[1]),
-            self.base_size
-        )
-        pos_embed = pos_embed.unsqueeze(0).to(dtype=latent.dtype, device=latent.device)
+    def forward(self, latent, start_sec, end_sec):
+        grid_size = (latent.shape[-3] // self.patch_size[0], latent.shape[-2] // self.patch_size[1], latent.shape[-1] // self.patch_size[2])
+        pos_embed = torch.stack([
+            self.get_pos_embedding_3d(self.embed_dim, grid_size, start_sec_, end_sec_, latent.device)
+            for start_sec_, end_sec_ in zip(start_sec, end_sec)])
+        pos_embed = pos_embed.to(dtype=latent.dtype, device=latent.device)
         pos_embed = self.proj_pos(pos_embed)
 
         latent = self.proj_latent(latent)
@@ -161,18 +211,42 @@ class TimeEmbed(torch.nn.Module):
         time_emb = self.time_proj(timesteps).to(dtype=dtype)
         time_emb = self.time_embedding(time_emb)
         return time_emb
+    
+
+class UnPatchify(torch.nn.Module):
+    def __init__(self, patch_size, in_channels, dim_hidden):
+        super().__init__()
+        num_values_per_patch = reduce(lambda x,y: x*y, patch_size)
+        self.patch_size = patch_size
+
+        self.norm_out = torch.nn.LayerNorm(dim_hidden, eps=1e-5, elementwise_affine=False)
+        self.proj_act = torch.nn.SiLU()
+        self.proj_out = torch.nn.Linear(dim_hidden, num_values_per_patch * in_channels, bias=True)
+        self.conv_out = torch.nn.Conv3d(in_channels, in_channels, kernel_size=3, padding=1)
+
+    def forward(self, hidden_states, T, H, W):
+        hidden_states = self.norm_out(hidden_states)
+        hidden_states = self.proj_act(hidden_states)
+        hidden_states = self.proj_out(hidden_states)
+        hidden_states = rearrange(
+            hidden_states,
+            "B (T H W) (PT PH PW C) -> B C (T PT) (H PH) (W PW)",
+            T=T//self.patch_size[0], H=H//self.patch_size[1], W=W//self.patch_size[2],
+            PT=self.patch_size[0], PH=self.patch_size[1], PW=self.patch_size[2]
+        )
+        hidden_states = self.conv_out(hidden_states)
+        return hidden_states
 
 
 class VideoDiT(torch.nn.Module):
-    def __init__(self, dim_hidden=1024, dim_time=1024, dim_text=1280, dim_head=64, num_blocks=16, patch_size=(4, 4, 4), in_channels=3):
+    def __init__(self, dim_hidden=1024, dim_time=1024, dim_text=768, dim_cross=768, dim_head=64, num_blocks=32, patch_size=(4, 4, 4), in_channels=4):
         super().__init__()
         self.time_emb = TimeEmbed(dim_time)
-        self.patchify = VideoPatchEmbed((16, 16, 16), patch_size, in_channels, dim_hidden)
-        self.blocks = torch.nn.ModuleList([DiTBlock(dim_hidden, dim_time, dim_text, dim_head) for _ in range(num_blocks)])
-        self.norm_out = torch.nn.LayerNorm(dim_hidden, eps=1e-5, elementwise_affine=False)
-        self.proj_out = torch.nn.Linear(dim_hidden, reduce(lambda x,y: x*y, patch_size) * in_channels, bias=True)
+        self.patchify = Patchify((None, 16, 16), patch_size, in_channels, dim_hidden)
+        self.blocks = torch.nn.ModuleList([DiTBlock(dim_hidden, [dim_time, dim_text], dim_cross, dim_head) for _ in range(num_blocks)])
+        self.unpatchify = UnPatchify(patch_size, in_channels, dim_hidden)
 
-    def forward(self, hidden_states, timesteps, text_emb):
+    def forward(self, hidden_states, timesteps, start_sec, end_sec, cross_emb, text_emb):
         # Shape
         B, C, T, H, W = hidden_states.shape
 
@@ -180,22 +254,15 @@ class VideoDiT(torch.nn.Module):
         time_emb = self.time_emb(timesteps, dtype=hidden_states.dtype)
 
         # Patchify
-        hidden_states = self.patchify(hidden_states)
+        hidden_states = self.patchify(hidden_states, start_sec, end_sec)
 
         # DiT Blocks
         for block in self.blocks:
-            hidden_states = block(hidden_states, time_emb, text_emb)
+            hidden_states = block(hidden_states, [time_emb, text_emb], cross_emb)
 
         # The following computation is different from the original version of DiT
-        # We make it simple.
-        hidden_states = self.norm_out(hidden_states)
-        hidden_states = self.proj_out(hidden_states)
-        hidden_states = rearrange(
-            hidden_states,
-            "B (T H W) (PT PH PW C) -> B C (T PT) (H PH) (W PW)",
-            T=T//self.patchify.patch_size[0], H=H//self.patchify.patch_size[1], W=W//self.patchify.patch_size[2],
-            PT=self.patchify.patch_size[0], PH=self.patchify.patch_size[1], PW=self.patchify.patch_size[2]
-        )
+        # We make it consistent with our VAE encoder.
+        hidden_states = self.unpatchify(hidden_states, T, H, W)
 
         return hidden_states
     

@@ -15,3 +15,5 @@ dependencies:
     - imageio
     - imageio[ffmpeg]
     - tensorboard
+    - sentencepiece
+    - ftfy

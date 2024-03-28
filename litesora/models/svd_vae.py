@@ -257,7 +257,6 @@ class SDVAEEncoder(torch.nn.Module):
     @staticmethod
     def from_diffusers(file_path=None, state_dict=None):
         model = SDVAEEncoder()
-        model.eval()
         model.load_state_dict_from_diffusers(file_path, state_dict)
         return model
 
@@ -487,6 +486,5 @@ class SVDVAEDecoder(torch.nn.Module):
     @staticmethod
     def from_diffusers(file_path=None, state_dict=None):
         model = SVDVAEDecoder()
-        model.eval()
         model.load_state_dict_from_diffusers(file_path, state_dict)
         return model
